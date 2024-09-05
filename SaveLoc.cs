@@ -56,8 +56,7 @@ public class SaveLocPlugin : BasePlugin
   public override string ModuleVersion => "0.0.1";
   public override string ModuleAuthor => "injurka";
 
-  private static SaveLocPlugin _instance;
-  public static SaveLocPlugin Instance => _instance;
+  public static SaveLocPlugin Instance { get; private set; } = new();
 
   private Dictionary<IntPtr, SaveLocPlayer> SaveLocPlayers = new();
   public List<SaveLocPlayer> Players => SaveLocPlayers.Values.ToList();
@@ -83,18 +82,18 @@ public class SaveLocPlugin : BasePlugin
   {
     base.Load(hotReload);
 
-    _instance ??= this;
-
-    RegisterListener<Listeners.OnClientConnect>(OnClientConnectHandler);
-    RegisterListener<Listeners.OnClientDisconnect>(OnClientDisconnectHandler);
+    Instance = this;
   }
 
   [ConsoleCommand("saveloc", "Save current location")]
+  [ConsoleCommand("css_saveloc", "Save current location")]
+  [ConsoleCommand("sm_saveloc", "Save current location")]
   [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
   public void OnSaveLocation(CCSPlayerController client, CommandInfo _)
   {
     var pawn = client.PlayerPawn.Value;
-    if (pawn == null) return;
+    if (pawn == null)
+      return;
 
     var origin = new DimensionVector(
       pawn.AbsOrigin!.X,
@@ -119,11 +118,14 @@ public class SaveLocPlugin : BasePlugin
   }
 
   [ConsoleCommand("tploc", "Teleport to location")]
+  [ConsoleCommand("css_tp", "Teleport to location")]
+  [ConsoleCommand("sm_tp", "Teleport to location")]
   [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
   public void OnTeleportLoc(CCSPlayerController client, CommandInfo _)
   {
     var pawn = client.PlayerPawn.Value;
-    if (pawn == null) return;
+    if (pawn == null || !(client is { PawnIsAlive: true }))
+      return;
 
     var (position, rotation, velocity) = Instance.GetPlayer(client).GetLocation();
 
@@ -133,23 +135,30 @@ public class SaveLocPlugin : BasePlugin
     }
   }
 
-  private void OnClientDisconnectHandler(int slot)
+  [GameEventHandler]
+  public HookResult OnPlayerFullConnect(EventPlayerConnectFull @event, GameEventInfo _)
   {
-    var client = new CCSPlayerController(NativeAPI.GetEntityFromIndex(slot + 1));
+    CCSPlayerController? client = @event.Userid;
 
-    if (!client.IsValid || client.IsBot) return;
+    if (client == null || !client.IsValid || client.IsBot || !client.UserId.HasValue)
+      return HookResult.Continue;
 
-    SetPlayer(client, null);
+    Instance.SetPlayer(client, new SaveLocPlayer(client));
+
+    return HookResult.Continue;
   }
 
-  private void OnClientConnectHandler(int slot, string name, string ipAddress)
+  [GameEventHandler]
+  public HookResult OnClientDisconnect(EventPlayerDisconnect @event, GameEventInfo _)
   {
-    var client = new CCSPlayerController(NativeAPI.GetEntityFromIndex(slot + 1));
+    CCSPlayerController? client = @event.Userid;
 
-    if (!client.IsValid || client.IsBot) return;
+    if (client == null || !client.IsValid || client.IsBot)
+      return HookResult.Continue;
 
-    var newPlayer = new SaveLocPlayer(client);
+    SetPlayer(client, null);
 
-    Instance.SetPlayer(client, newPlayer);
+
+    return HookResult.Continue;
   }
 }
