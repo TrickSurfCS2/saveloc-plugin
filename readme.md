@@ -2,6 +2,6 @@
 
 CS:Sharp Save and Teleport location Plugin
 
-## Command ##
+## Command
 - `saveloc` - Save current location
 - `tploc` - Teleport to saved location
