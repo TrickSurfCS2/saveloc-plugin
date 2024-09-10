@@ -1,6 +1,5 @@
 ﻿using CounterStrikeSharp.API.Core;
-using CounterStrikeSharp.API.Core.Attributes.Registration;
-using CounterStrikeSharp.API.Modules.Commands;
+using CounterStrikeSharp.API.Core.Attributes;
 using CounterStrikeSharp.API.Modules.Utils;
 
 namespace SaveLoc;
@@ -67,7 +66,8 @@ public class SaveLocPlayer(CCSPlayerController client)
   }
 }
 
-partial class SaveLocPlugin : BasePlugin
+[MinimumApiVersion(260)]
+public partial class SaveLocPlugin : BasePlugin
 {
   public override string ModuleName => "Save and Teleport location Plugin";
   public override string ModuleVersion => "0.0.1";
@@ -92,45 +92,5 @@ partial class SaveLocPlugin : BasePlugin
     {
       SaveLocPlayers.Remove(client.Handle);
     }
-  }
-
-  [ConsoleCommand("saveloc", "Save current location")]
-  [ConsoleCommand("sm_saveloc", "Save current location")]
-  [CommandHelper(whoCanExecute: CommandUsage.CLIENT_ONLY)]
-  public void OnSaveLocation(CCSPlayerController client, CommandInfo _)
-  {
-    // var pawn = client.PlayerPawn.Value;
-    // if (pawn == null)
-    //   return;
-
-    // var origin = new DimensionVector
-    // {
-    //   X = pawn.AbsOrigin!.X,
-    //   Y = pawn.AbsOrigin!.Y,
-    //   Z = pawn.AbsOrigin!.Z
-    // };
-    // var angle = new DimensionVector
-    // {
-    //   X = pawn.EyeAngles!.X,
-    //   Y = pawn.EyeAngles!.Y,
-    //   Z = pawn.EyeAngles!.Z
-    // };
-    // var velocity = new DimensionVector
-    // {
-    //   X = pawn.AbsVelocity!.X,
-    //   Y = pawn.AbsVelocity!.Y,
-    //   Z = pawn.AbsVelocity!.Z
-    // };
-
-    // var location = new Location
-    // {
-    //   origin = origin,
-    //   angle = angle,
-    //   velocity = velocity,
-    // };
-
-    // var player = Instance.GetPlayer(client);
-    // player.SetLocation(location);
-    // player.Player.PrintToChat($" {ChatColors.Purple} Saved location {ChatColors.Grey}#{player.SavedLocations.Count}");
   }
 }
