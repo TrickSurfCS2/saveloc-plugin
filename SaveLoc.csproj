@@ -2,12 +2,25 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>SaveLoc</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CounterStrikeSharp.API" Version="1.0.264" />
   </ItemGroup>
+
+  <!-- Добавляем задачу копирования файлов после сборки -->
+  <Target Name="CopyFilesAfterBuild" AfterTargets="Build">
+    <ItemGroup>
+      <SourceFiles Include="$(OutputPath)**\*.*" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(SourceFiles)" DestinationFolder="/home/injurka/.steam/steamcmd/cs22/game/csgo/addons/counterstrikesharp/plugins/SaveLoc/%(RecursiveDir)" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" />
+
+    <Message Text="Files copied from $(OutputPath) to /home/injurka/.steam/steamcmd/cs22/game/csgo/addons/counterstrikesharp/plugins/SaveLoc." Importance="high" />
+  </Target>
 
 </Project>
