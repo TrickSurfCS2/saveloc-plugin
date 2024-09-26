@@ -1,13 +1,13 @@
-## SaveLoc Plugin
+# SaveLoc Plugin
 
 CS:Sharp Save and Teleport location Plugin
 
-# Installation
+## Installation
 1. Install [CounterStrike Sharp](https://github.com/roflmuffin/CounterStrikeSharp) and [Metamod:Source](https://www.sourcemm.net/downloads.php/?branch=master)
 3. Download [Plugin](https://github.com/TrickSurfCS2/saveloc-plugin/releases/)
 4. Unzip the archive and upload it to the game server (`/csgo/addons/counterstrikesharp/plugins`)
 
-# Commands
+## Commands
 
 | Command          | Description                   |
 |------------------|-------------------------------|
